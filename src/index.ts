@@ -1,11 +1,11 @@
 // @ts-nocheck
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp";
 import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import { z } from "zod";
-import { postReplyToLofty, createLead } from "./lofty.js";
-import { askOpenAI } from "./openai.js";
+import { postReplyToLofty, createLead } from "./lofty";
+import { askOpenAI } from "./openai";
 
 dotenv.config();
 
