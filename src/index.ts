@@ -18,42 +18,53 @@ function createServer() {
     version: "0.1.0",
   });
 
-  (server as any).tool(
+  const sendMessageCallback = (async (args: any) => {
+    const contactId = args.contactId as string;
+    const message = args.message as string;
+    await postReplyToLofty(contactId, message);
+    return {
+      content: [{ type: "text", text: `Message sent to contact ${contactId}` }],
+    };
+  }) as any;
+
+  server.tool(
     "send_message_to_contact",
     "Send a message to a Lofty CRM contact",
     {
       contactId: z.string().describe("The Lofty contact ID"),
       message: z.string().describe("The message to send to the contact"),
     },
-    async (args: any) => {
-      const contactId = args.contactId as string;
-      const message = args.message as string;
-      await postReplyToLofty(contactId, message);
-      return {
-        content: [{ type: "text", text: `Message sent to contact ${contactId}` }],
-      };
-    }
+    sendMessageCallback
   );
 
-  (server as any).tool(
+  const generateAiReplyCallback = (async (args: any) => {
+    const contactId = args.contactId as string;
+    const message = args.message as string;
+    const prompt = `Lofty inbound message from contact ${contactId}: ${message}`;
+    const reply = await askOpenAI(prompt);
+    return {
+      content: [{ type: "text", text: reply }],
+    };
+  }) as any;
+
+  server.tool(
     "generate_ai_reply",
     "Generate an AI reply for an inbound message from a Lofty contact",
     {
       contactId: z.string().describe("The Lofty contact ID"),
       message: z.string().describe("The inbound message from the contact"),
     },
-    async (args: any) => {
-      const contactId = args.contactId as string;
-      const message = args.message as string;
-      const prompt = `Lofty inbound message from contact ${contactId}: ${message}`;
-      const reply = await askOpenAI(prompt);
-      return {
-        content: [{ type: "text", text: reply }],
-      };
-    }
+    generateAiReplyCallback
   );
 
-  (server as any).tool(
+  const addLoftyLeadCallback = (async (args: any) => {
+    const result = await createLead(args);
+    return {
+      content: [{ type: "text", text: `Lead created: ${JSON.stringify(result)}` }],
+    };
+  }) as any;
+
+  server.tool(
     "add_lofty_lead",
     "Create a new lead in Lofty CRM",
     {
@@ -63,12 +74,7 @@ function createServer() {
       phone: z.string().optional().describe("Lead's phone number"),
       source: z.string().optional().describe("Lead source (e.g. website, referral)"),
     },
-    async (args: any) => {
-      const result = await createLead(args);
-      return {
-        content: [{ type: "text", text: `Lead created: ${JSON.stringify(result)}` }],
-      };
-    }
+    addLoftyLeadCallback
   );
 
   return server;
