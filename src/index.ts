@@ -4,7 +4,7 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import { z } from "zod";
-import { postReplyToLofty } from "./lofty";
+import { postReplyToLofty, createLead } from "./lofty";
 import { askOpenAI } from "./openai";
 
 dotenv.config();
@@ -49,6 +49,24 @@ function createServer() {
       const reply = await askOpenAI(prompt);
       return {
         content: [{ type: "text", text: reply }],
+      };
+    }
+  );
+
+  (server as any).tool(
+    "add_lofty_lead",
+    "Create a new lead in Lofty CRM",
+    {
+      firstName: z.string().describe("Lead's first name"),
+      lastName: z.string().describe("Lead's last name"),
+      email: z.string().optional().describe("Lead's email address"),
+      phone: z.string().optional().describe("Lead's phone number"),
+      source: z.string().optional().describe("Lead source (e.g. website, referral)"),
+    },
+    async (args: any) => {
+      const result = await createLead(args);
+      return {
+        content: [{ type: "text", text: `Lead created: ${JSON.stringify(result)}` }],
       };
     }
   );
