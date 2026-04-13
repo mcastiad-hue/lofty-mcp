@@ -4,8 +4,8 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import { z } from "zod";
-import { postReplyToLofty, createLead } from "./lofty";
-import { askOpenAI } from "./openai";
+import { postReplyToLofty, createLead } from "./lofty.js";
+import { askOpenAI } from "./openai.js";
 
 dotenv.config();
 
