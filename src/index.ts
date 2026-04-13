@@ -55,14 +55,24 @@ function createServer() {
   return server;
 }
 
-app.all("/mcp", async (req: Request, res: Response) => {
-  const server = createServer();
-  const transport = new StreamableHTTPServerTransport({
-    sessionIdGenerator: undefined,
-  });
-  res.on("close", () => transport.close());
-  await server.connect(transport);
-  await transport.handleRequest(req, res, req.body);
+app.post("/mcp", async (req: Request, res: Response) => {
+  try {
+    const server = createServer();
+    const transport = new StreamableHTTPServerTransport({
+      sessionIdGenerator: undefined,
+    });
+    res.on("close", () => transport.close());
+    await server.connect(transport);
+    await transport.handleRequest(req, res, req.body);
+  } catch (err: any) {
+    if (!res.headersSent) {
+      res.status(500).json({ error: err?.message ?? "internal" });
+    }
+  }
+});
+
+app.get("/mcp", (_req: Request, res: Response) => {
+  res.status(200).json({ name: "lofty-mcp", version: "0.1.0", status: "ok" });
 });
 
 app.get("/health", (_req: Request, res: Response) => res.json({ status: "ok" }));
