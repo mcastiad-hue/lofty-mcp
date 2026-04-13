@@ -17,7 +17,7 @@ function createServer() {
     version: "0.1.0",
   });
 
-  server.tool(
+  (server as any).tool(
     "send_message_to_contact",
     "Send a message to a Lofty CRM contact",
     {
@@ -34,7 +34,7 @@ function createServer() {
     }
   );
 
-  server.tool(
+  (server as any).tool(
     "generate_ai_reply",
     "Generate an AI reply for an inbound message from a Lofty contact",
     {
