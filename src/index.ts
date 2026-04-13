@@ -24,7 +24,9 @@ function createServer() {
       contactId: z.string().describe("The Lofty contact ID"),
       message: z.string().describe("The message to send to the contact"),
     },
-    async ({ contactId, message }: { contactId: string; message: string }) => {
+    async (args: any) => {
+      const contactId = args.contactId as string;
+      const message = args.message as string;
       await postReplyToLofty(contactId, message);
       return {
         content: [{ type: "text", text: `Message sent to contact ${contactId}` }],
@@ -39,7 +41,9 @@ function createServer() {
       contactId: z.string().describe("The Lofty contact ID"),
       message: z.string().describe("The inbound message from the contact"),
     },
-    async ({ contactId, message }: { contactId: string; message: string }) => {
+    async (args: any) => {
+      const contactId = args.contactId as string;
+      const message = args.message as string;
       const prompt = `Lofty inbound message from contact ${contactId}: ${message}`;
       const reply = await askOpenAI(prompt);
       return {
